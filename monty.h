@@ -1,21 +1,12 @@
-#ifndef _MONTY_H_
-#define _MONTY_H_
+#ifndef MONTY_H
+#define MONTY_H
 
-#define _GNU_SOURCE
-/* Libraries */
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
-#include <ctype.h>
 
-/* Declaration of the global variables */
-extern int token;
-
-/* Structures */
+#define MAX_LEN 1024
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -24,7 +15,7 @@ extern int token;
  * @next: points to the next element of the stack (or queue)
  *
  * Description: doubly linked list node structure
- * for stack, queues, LIFO, FIFO Holberton project
+ * for stack, queues, LIFO, FIFO
  */
 typedef struct stack_s
 {
@@ -39,39 +30,66 @@ typedef struct stack_s
  * @f: function to handle the opcode
  *
  * Description: opcode and its function
- * for stack, queues, LIFO, FIFO Holberton project
+ * for stack, queues, LIFO, FIFO
  */
 typedef struct instruction_s
 {
 	char *opcode;
-	stack_t *(*f)(stack_t **stack, unsigned int line_number);
+	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/* Prototypes */
-stack_t *push(stack_t **stack, unsigned int line_number);
-stack_t *pall(stack_t **stack, unsigned int line_number);
-stack_t *pint(stack_t **stack, unsigned int line_number);
-stack_t *pop(stack_t **stack, unsigned int line_number);
-stack_t *swap(stack_t **stack, unsigned int line_number);
-void free_stack(stack_t **stack);
-stack_t *(*op_func(char *s, stack_t **stack,
-		   unsigned int line_number))(stack_t **stack,
-					      unsigned int line_number);
-stack_t *add(stack_t **stack, unsigned int line_number);
-stack_t *sub(stack_t **stack, unsigned int line_number);
-stack_t *nop(stack_t **stack, unsigned int line_number);
-stack_t *mod(stack_t **stack, unsigned int line_number);
-stack_t *div_op(stack_t **stack, unsigned int line_number);
-stack_t *mul_op(stack_t **stack, unsigned int line_num);
-stack_t *pchar(stack_t **stack, unsigned int line_num);
-stack_t *pstr(stack_t **stack, unsigned int line_number);
-stack_t *rotl(stack_t **stack, unsigned int line_number);
-void check_digit(char *num_str, int line_num, char *string,
-	stack_t *stack, FILE  *file);
-int loop_func(int line_num, char *string, stack_t *stack, FILE *file,
-	ssize_t read_c, size_t nbytes);
-void push_error_handler(int line_num, char *string
-		, stack_t *stack, FILE  *file, char *opcode);
+/**
+ * struct op_s - opcode, argument and stack
+ * @input: stream represent input instruction
+ * @opcode: the opcode
+ * @arg: argument
+ * @head: linked list representing stack
+ */
+typedef struct op_s
+{
+	FILE *input;
+	char *opcode;
+	char *arg;
+	stack_t *head;
+} op_t;
 
-#endif /* _MONTY_H_ */
+extern op_t op;
 
+/* monty.c */
+void monty(void);
+void exec_op(char *line, unsigned int line_number);
+void get_op(char *line);
+
+/* get_op_func.c */
+void (*get_op_func(void))(stack_t **, unsigned int);
+
+/* op_functions.c */
+void op_push(stack_t **stack, unsigned int line_number);
+void op_pall(stack_t **stack, unsigned int line_number);
+void op_pint(stack_t **stack, unsigned int line_number);
+void op_pop(stack_t **stack, unsigned int line_number);
+void op_swap(stack_t **stack, unsigned int line_number);
+
+/* op_functions2.c */
+void op_add(stack_t **stack, unsigned int line_number);
+void op_nop(stack_t **stack, unsigned int line_number);
+void op_sub(stack_t **stack, unsigned int line_number);
+void op_div(stack_t **stack, unsigned int line_number);
+void op_mul(stack_t **stack, unsigned int line_number);
+
+/* op_functions3.c */
+void op_mod(stack_t **stack, unsigned int line_number);
+void op_pchar(stack_t **stack, unsigned int line_number);
+void op_pstr(stack_t **stack, unsigned int line_number);
+
+/* free_functions.c */
+void free_list(stack_t *head);
+void free_op(void);
+
+/* strings.c */
+char *_strcpy(char *dest, const char *src);
+char *_strdup(const char *str);
+char *_strtok(char *str, const char *delim);
+int is_valid_int(char *str);
+
+#endif /* MONTY_H */

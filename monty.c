@@ -1,35 +1,72 @@
 #include "monty.h"
-int token = 1;
+
 /**
- * main - reads the bytecode and interprets it
- * @argc : number of arg
- * @argv : array of arg
- * Return: 0 on success
+ * monty - starts the monty interpreter
  */
-
-int main(int argc, char **argv)
+void monty(void)
 {
-	const char *filename;
-	char *string = NULL;
-	size_t nbytes = 1;
-	FILE *file;
-	unsigned int line_num = 0;
-	ssize_t read_c = 0;
-	stack_t *stack;
+	char line[MAX_LEN];
+	size_t line_len = MAX_LEN - 1;
+	unsigned int line_number = 0;
 
-	stack = NULL;
-	if (argc != 2)
+	/* read line from input */
+	while (fgets(line, line_len, op.input))
 	{
-		fprintf(stderr, "USAGE: monty file\n");
+		line_number++;
+		exec_op(line, line_number);
+	}
+
+}
+
+/**
+ * exec_op - checks if a given string is a valid operation and executes it
+ * @line: string
+ * @line_number: line number of current instruction
+ */
+void exec_op(char *line, unsigned int line_number)
+{
+	void (*f)(stack_t **, unsigned int);
+	char *message;
+
+	get_op(line);
+
+	if (op.opcode == NULL || op.opcode[0] == '#')
+		return;
+
+	f = get_op_func();
+	if (f == NULL)
+	{
+		message = "L%u: unknown instruction %s\n";
+		fprintf(stderr, message, line_number, op.opcode);
+		free_op();
 		exit(EXIT_FAILURE);
 	}
-	filename = argv[1];
-	file = fopen(filename, "r");
-	if (!file)
+
+	f(&(op.head), line_number);
+}
+
+/**
+ * get_op - gets the correct operation from a given string and updates op
+ * @line: string
+ */
+void get_op(char *line)
+{
+	char *str = line;
+
+	while (*str)
 	{
-		fprintf(stderr, "Error: Can't open file <file>");
-		exit(EXIT_FAILURE);
+		if (*str < ' ')
+			*str = ' ';
+
+		str++;
 	}
-	loop_func(line_num, string, stack, file, read_c, nbytes);
-	return (0);
+
+	if (op.opcode)
+		free(op.opcode);
+
+	if (op.arg)
+		free(op.arg);
+
+	op.opcode = _strdup(_strtok(line, " "));
+	op.arg = _strdup(_strtok(NULL, " "));
 }
