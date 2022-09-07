@@ -123,6 +123,5 @@ Holberton
 ```
 
 ## Author
-**boussaid youssef** - [youssef github](https://github.com/youssefboussaid)
-/
-**ben ali jassem** - [jassem github](https://github.com/jassemb)
+**Atoro-Tywo Olatomiwa**
+
